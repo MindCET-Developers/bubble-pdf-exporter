@@ -53,10 +53,8 @@ app.post('/export-pdf', async (req, res) => {
       margin: options.margin || styles.page?.margin,
     });
 
-    const filename = encodeURIComponent(metadata.title || 'document');
-
     res.setHeader('Content-Type', 'application/pdf');
-    res.setHeader('Content-Disposition', `attachment; filename*=UTF-8''${filename}.pdf`);
+    res.setHeader('Content-Disposition', 'attachment; filename="document.pdf"');
     res.setHeader('Content-Length', pdfBuffer.length);
     res.send(pdfBuffer);
   } catch (err) {
