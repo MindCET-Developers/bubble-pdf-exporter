@@ -4,14 +4,32 @@ const { buildHTML } = require('./htmlBuilder');
 const { generatePDF, closeBrowser } = require('./pdfGenerator');
 
 const app = express();
+
+// Accept both JSON and plain text (Bubble sometimes sends malformed JSON)
+app.use('/export-pdf', express.text({ type: '*/*', limit: '10mb' }));
 app.use(express.json({ limit: '10mb' }));
+
+function parseBody(req) {
+  if (typeof req.body === 'string') {
+    try {
+      return JSON.parse(req.body);
+    } catch {
+      return null;
+    }
+  }
+  return req.body;
+}
 
 app.get('/', (req, res) => {
   res.json({ status: 'ok', service: 'pdf-exporter' });
 });
 
 app.post('/export-pdf', async (req, res) => {
-  const { styles = {}, sections, metadata = {}, lang = 'he', options = {} } = req.body;
+  const body = parseBody(req);
+  if (!body) {
+    return res.status(400).json({ error: 'Invalid JSON body' });
+  }
+  const { styles = {}, sections, metadata = {}, lang = 'he', options = {} } = body;
 
   let parsedSections = sections;
   if (typeof sections === 'string') {
