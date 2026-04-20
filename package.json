@@ -1,0 +1,18 @@
+{
+  "name": "pdf-exporter",
+  "version": "1.0.0",
+  "description": "PDF export service for Bubble",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "nodemon src/server.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "puppeteer": "^21.0.0",
+    "handlebars": "^4.7.8"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
+  }
+}
