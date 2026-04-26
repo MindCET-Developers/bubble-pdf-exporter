@@ -105,6 +105,35 @@ function buildFixedFooter(styles) {
   };
 }
 
+const COPYRIGHT_HTML = `
+<div class="copyright-block">
+  <p class="copyright-intro">מורה יקר/ה, אנחנו שמחים לשתף אותך בתכנים המקצועיים שפיתחנו</p>
+  <div class="copyright-box">חשוב להגדיש שתכנים אלו מוגנים בזכויות יוצרים ואין לשתף או להפיץ אותם.</div>
+</div>`;
+
+const COPYRIGHT_CSS = `
+.copyright-block {
+  margin-top: 32px;
+  text-align: center;
+  direction: rtl;
+}
+.copyright-intro {
+  font-size: 13px;
+  color: #2B2B2B;
+  margin-bottom: 10px;
+}
+.copyright-box {
+  display: inline-block;
+  border: 2px solid #00B0C7;
+  border-radius: 10px;
+  padding: 12px 20px;
+  font-size: 13px;
+  font-weight: 700;
+  color: #2B2B2B;
+  max-width: 480px;
+  line-height: 1.6;
+}`;
+
 function buildHTML(css, sections, metadata, styles, lang) {
   const dir = lang === 'he' || lang === 'ar' ? 'rtl' : 'ltr';
   const content = sections.map(renderSection).join('\n');
@@ -123,6 +152,7 @@ function buildHTML(css, sections, metadata, styles, lang) {
 ${css}
 ${header.css}
 ${footer.css}
+${COPYRIGHT_CSS}
 .page-content { padding-top: ${escapeHtml(topPad)}; padding-bottom: ${escapeHtml(botPad)}; }
   </style>
 </head>
@@ -130,6 +160,7 @@ ${footer.css}
   ${header.html}
   <div class="page-content">
     ${content}
+    ${COPYRIGHT_HTML}
   </div>
   ${footer.html}
 </body>
