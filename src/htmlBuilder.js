@@ -89,8 +89,8 @@ function buildFixedHeader(styles) {
   const height = styles.header.height || '60px';
   return {
     html: `<div class="pdf-fixed-header"><img src="${escapeHtml(url)}" alt="header"></div>`,
-    css: `.pdf-fixed-header { position: fixed; top: 0; left: 0; right: 0; height: ${escapeHtml(height)}; z-index: 1000; }
-.pdf-fixed-header img { width: 100%; height: 100%; object-fit: contain; display: block; }`,
+    css: `.pdf-fixed-header { position: fixed; top: 0; left: 0; right: 0; height: ${escapeHtml(height)}; z-index: 1000; background: white; }
+.pdf-fixed-header img { width: 100%; height: 100%; object-fit: fill; display: block; }`,
   };
 }
 
@@ -100,8 +100,8 @@ function buildFixedFooter(styles) {
   const height = styles.footer.height || '60px';
   return {
     html: `<div class="pdf-fixed-footer"><img src="${escapeHtml(url)}" alt="footer"></div>`,
-    css: `.pdf-fixed-footer { position: fixed; bottom: 0; left: 0; right: 0; height: ${escapeHtml(height)}; z-index: 1000; }
-.pdf-fixed-footer img { width: 100%; height: 100%; object-fit: contain; display: block; }`,
+    css: `.pdf-fixed-footer { position: fixed; bottom: 0; left: 0; right: 0; height: ${escapeHtml(height)}; z-index: 1000; background: white; }
+.pdf-fixed-footer img { width: 100%; height: 100%; object-fit: fill; display: block; }`,
   };
 }
 
