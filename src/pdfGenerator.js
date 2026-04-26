@@ -1,4 +1,6 @@
 const puppeteer = require('puppeteer');
+const https = require('https');
+const http = require('http');
 
 let browserInstance = null;
 
@@ -16,12 +18,37 @@ async function getBrowser() {
   return browserInstance;
 }
 
-function buildHeaderTemplate() {
-  return '<span></span>';
+function fetchAsBase64(url) {
+  return new Promise((resolve, reject) => {
+    const client = url.startsWith('https') ? https : http;
+    client.get(url, (res) => {
+      const chunks = [];
+      res.on('data', chunk => chunks.push(chunk));
+      res.on('end', () => {
+        const buf = Buffer.concat(chunks);
+        const mime = res.headers['content-type'] || 'image/png';
+        resolve(`data:${mime};base64,${buf.toString('base64')}`);
+      });
+      res.on('error', reject);
+    }).on('error', reject);
+  });
 }
 
-function buildFooterTemplate() {
-  return '<span></span>';
+async function resolveImageUrl(url) {
+  if (!url) return null;
+  if (url.startsWith('data:')) return url;
+  try {
+    return await fetchAsBase64(url);
+  } catch {
+    return url;
+  }
+}
+
+function buildImageTemplate(base64Url, height) {
+  if (!base64Url) return '<span></span>';
+  return `<div style="width:100%;height:${height};margin:0;padding:0;line-height:0;">
+    <img src="${base64Url}" style="width:100%;height:${height};object-fit:fill;display:block;">
+  </div>`;
 }
 
 async function generatePDF(html, options = {}) {
@@ -32,14 +59,29 @@ async function generatePDF(html, options = {}) {
     await page.setContent(html, { waitUntil: 'networkidle0' });
 
     const baseMargin = options.margin || '15mm';
+    const header = options.header || {};
+    const footer = options.footer || {};
+
+    const headerUrl = await resolveImageUrl(header.logo_url);
+    const footerUrl = await resolveImageUrl(footer.logo_url);
+
+    const headerHeight = header.height || '60px';
+    const footerHeight = footer.height || '60px';
+
+    const hasHeader = !!headerUrl;
+    const hasFooter = !!footerUrl;
+    const displayHeaderFooter = hasHeader || hasFooter;
 
     const pdfOptions = {
       format: options.page_size || 'A4',
       landscape: options.orientation === 'landscape',
       printBackground: true,
+      displayHeaderFooter,
+      headerTemplate: hasHeader ? buildImageTemplate(headerUrl, headerHeight) : '<span></span>',
+      footerTemplate: hasFooter ? buildImageTemplate(footerUrl, footerHeight) : '<span></span>',
       margin: {
-        top: baseMargin,
-        bottom: baseMargin,
+        top: hasHeader ? headerHeight : baseMargin,
+        bottom: hasFooter ? footerHeight : baseMargin,
         left: baseMargin,
         right: baseMargin,
       },

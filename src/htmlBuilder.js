@@ -83,27 +83,6 @@ function renderSection(section) {
   return '';
 }
 
-function buildFixedHeader(styles) {
-  const url = styles?.header?.logo_url;
-  if (!url) return { html: '', css: '' };
-  const height = styles.header.height || '60px';
-  return {
-    html: `<div class="pdf-fixed-header"><img src="${escapeHtml(url)}" alt="header"></div>`,
-    css: `.pdf-fixed-header { position: fixed; top: 0; left: 0; right: 0; height: ${escapeHtml(height)}; z-index: 1000; background: white; }
-.pdf-fixed-header img { width: 100%; height: 100%; object-fit: fill; display: block; }`,
-  };
-}
-
-function buildFixedFooter(styles) {
-  const url = styles?.footer?.logo_url;
-  if (!url) return { html: '', css: '' };
-  const height = styles.footer.height || '60px';
-  return {
-    html: `<div class="pdf-fixed-footer"><img src="${escapeHtml(url)}" alt="footer"></div>`,
-    css: `.pdf-fixed-footer { position: fixed; bottom: 0; left: 0; right: 0; height: ${escapeHtml(height)}; z-index: 1000; background: white; }
-.pdf-fixed-footer img { width: 100%; height: 100%; object-fit: fill; display: block; }`,
-  };
-}
 
 const COPYRIGHT_HTML = `
 <div class="copyright-block">
@@ -137,10 +116,6 @@ const COPYRIGHT_CSS = `
 function buildHTML(css, sections, metadata, styles, lang) {
   const dir = lang === 'he' || lang === 'ar' ? 'rtl' : 'ltr';
   const content = sections.map(renderSection).join('\n');
-  const header = buildFixedHeader(styles);
-  const footer = buildFixedFooter(styles);
-  const topPad = header.html ? (styles.header?.height || '60px') : '0';
-  const botPad = footer.html ? (styles.footer?.height || '60px') : '0';
 
   return `<!DOCTYPE html>
 <html lang="${escapeHtml(lang || 'he')}" dir="${dir}">
@@ -150,19 +125,14 @@ function buildHTML(css, sections, metadata, styles, lang) {
   <title>${escapeHtml(metadata?.title || 'Document')}</title>
   <style>
 ${css}
-${header.css}
-${footer.css}
 ${COPYRIGHT_CSS}
-.page-content { padding-top: ${escapeHtml(topPad)}; padding-bottom: ${escapeHtml(botPad)}; }
   </style>
 </head>
 <body>
-  ${header.html}
   <div class="page-content">
     ${content}
     ${COPYRIGHT_HTML}
   </div>
-  ${footer.html}
 </body>
 </html>`;
 }

@@ -53,6 +53,8 @@ app.post('/export-pdf', async (req, res) => {
       page_size: options.page_size,
       orientation: options.orientation,
       margin: options.margin || styles.page?.margin,
+      header: styles.header,
+      footer: styles.footer,
     });
 
     res.setHeader('Content-Type', 'application/pdf');
