@@ -145,6 +145,19 @@ hr.divider {
 
 .spacer { display: block; }
 
+p, li, h1, h2, h3, h4, td {
+  orphans: 3;
+  widows: 3;
+}
+
+h1, h2, h3, h4 {
+  page-break-after: avoid;
+}
+
+tr, img {
+  page-break-inside: avoid;
+}
+
 ${elementCSS}
 
 ${tableCSS}

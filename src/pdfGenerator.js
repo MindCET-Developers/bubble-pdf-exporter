@@ -44,10 +44,19 @@ async function resolveImageUrl(url) {
   }
 }
 
+function toMm(value) {
+  const num = parseFloat(value);
+  const unit = value.replace(/[\d.]/g, '') || 'px';
+  if (unit === 'mm') return num;
+  if (unit === 'cm') return num * 10;
+  if (unit === 'in') return num * 25.4;
+  return num * 0.264583; // px → mm at 96 DPI
+}
+
 function buildImageTemplate(base64Url, height) {
   if (!base64Url) return '<span></span>';
-  return `<div style="width:100%;height:${height};margin:0;padding:0;line-height:0;">
-    <img src="${base64Url}" style="width:100%;height:${height};object-fit:fill;display:block;">
+  return `<div style="width:100%;height:${height};margin:0;padding:0;display:flex;align-items:center;justify-content:center;">
+    <img src="${base64Url}" style="max-width:100%;max-height:${height};object-fit:contain;display:block;">
   </div>`;
 }
 
@@ -80,8 +89,8 @@ async function generatePDF(html, options = {}) {
       headerTemplate: hasHeader ? buildImageTemplate(headerUrl, headerHeight) : '<span></span>',
       footerTemplate: hasFooter ? buildImageTemplate(footerUrl, footerHeight) : '<span></span>',
       margin: {
-        top: hasHeader ? headerHeight : baseMargin,
-        bottom: hasFooter ? footerHeight : baseMargin,
+        top: hasHeader ? `${toMm(headerHeight) + 5}mm` : baseMargin,
+        bottom: hasFooter ? `${toMm(footerHeight) + 5}mm` : baseMargin,
         left: baseMargin,
         right: baseMargin,
       },
