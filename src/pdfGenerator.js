@@ -90,8 +90,8 @@ async function generatePDF(html, options = {}) {
       headerTemplate: hasHeader ? buildImageTemplate(headerUrl, headerHeight) : '<span></span>',
       footerTemplate: hasFooter ? buildImageTemplate(footerUrl, footerHeight) : '<span></span>',
       margin: {
-        top: hasHeader ? `${toMm(headerHeight) + 5}mm` : baseMargin,
-        bottom: hasFooter ? `${toMm(footerHeight) + 5}mm` : baseMargin,
+        top: hasHeader ? `${toMm(headerHeight) + 15}mm` : baseMargin,
+        bottom: hasFooter ? `${toMm(footerHeight) + 15}mm` : baseMargin,
         left: baseMargin,
         right: baseMargin,
       },
