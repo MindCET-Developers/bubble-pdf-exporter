@@ -38,12 +38,17 @@ async function sectionToParagraphs(section, styles) {
   const rtl = true; // always RTL for Hebrew
 
   if (['h1', 'h2', 'h3', 'h4'].includes(section.type)) {
-    const levelMap = { h1: HeadingLevel.HEADING_1, h2: HeadingLevel.HEADING_2, h3: HeadingLevel.HEADING_3, h4: HeadingLevel.HEADING_4 };
+    const sizeMap = { h1: 40, h2: 32, h3: 28, h4: 24 };
     return [new Paragraph({
-      heading: levelMap[section.type],
       bidirectional: rtl,
       alignment: AlignmentType.RIGHT,
-      children: [new TextRun({ text: section.text || '', rightToLeft: rtl })],
+      spacing: { before: 240, after: 120 },
+      children: [new TextRun({
+        text: section.text || '',
+        rightToLeft: rtl,
+        bold: true,
+        size: sizeMap[section.type],
+      })],
     })];
   }
 
