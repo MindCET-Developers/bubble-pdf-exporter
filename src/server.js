@@ -2,11 +2,13 @@ const express = require('express');
 const { buildCSS } = require('./cssBuilder');
 const { buildHTML } = require('./htmlBuilder');
 const { generatePDF, closeBrowser } = require('./pdfGenerator');
+const { generateDOCX } = require('./docxGenerator');
 
 const app = express();
 
 // Accept both JSON and plain text (Bubble sometimes sends malformed JSON)
 app.use('/export-pdf', express.text({ type: '*/*', limit: '10mb' }));
+app.use('/export-docx', express.text({ type: '*/*', limit: '10mb' }));
 app.use(express.json({ limit: '10mb' }));
 
 function parseBody(req) {
@@ -64,6 +66,40 @@ app.post('/export-pdf', async (req, res) => {
   } catch (err) {
     console.error('PDF generation error:', err);
     res.status(500).json({ error: 'Failed to generate PDF', details: err.message });
+  }
+});
+
+app.post('/export-docx', async (req, res) => {
+  const body = parseBody(req);
+  if (!body) {
+    return res.status(400).json({ error: 'Invalid JSON body' });
+  }
+  const { styles = {}, sections, metadata = {}, lang = 'he' } = body;
+
+  let parsedSections = sections;
+  if (typeof sections === 'string') {
+    try {
+      const cleaned = sections.replace(/\\"/g, '"');
+      parsedSections = JSON.parse(cleaned);
+    } catch {
+      return res.status(400).json({ error: 'sections must be a valid JSON array' });
+    }
+  }
+
+  if (!Array.isArray(parsedSections) || parsedSections.length === 0) {
+    return res.status(400).json({ error: 'sections array is required and must not be empty' });
+  }
+
+  try {
+    const docxBuffer = await generateDOCX(parsedSections, metadata, styles);
+    const filename = encodeURIComponent(metadata.title || 'document') + '.docx';
+    res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document');
+    res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
+    res.setHeader('Content-Length', docxBuffer.length);
+    res.send(docxBuffer);
+  } catch (err) {
+    console.error('DOCX generation error:', err);
+    res.status(500).json({ error: 'Failed to generate DOCX', details: err.message });
   }
 });
 
