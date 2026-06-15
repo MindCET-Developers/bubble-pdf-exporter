@@ -87,7 +87,7 @@ function renderSection(section) {
 const COPYRIGHT_HTML = `
 <div class="copyright-block">
   <p class="copyright-intro">מורה יקר/ה, אנחנו שמחים לשתף אותך בתכנים המקצועיים שפיתחנו</p>
-  <div class="copyright-box">חשוב להגדיש שתכנים אלו מוגנים בזכויות יוצרים ואין לשתף או להפיץ אותם.</div>
+  <div class="copyright-box">חשוב להדגיש שתכנים אלו מוגנים בזכויות יוצרים ואין לשתף או להפיץ אותם.</div>
 </div>`;
 
 const COPYRIGHT_CSS = `

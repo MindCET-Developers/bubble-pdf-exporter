@@ -111,11 +111,12 @@ function computeImageHeightMm(image, fallbackHeight, pageWidthMm) {
   return toMm(fallbackHeight);
 }
 
-function buildImageTemplate(base64Url) {
+function buildImageTemplate(base64Url, heightPx) {
   if (!base64Url) return '<span></span>';
+  const h = heightPx || 50;
   return `<style>* { margin: 0; padding: 0; } body { margin: 0 !important; }</style>
-  <div style="width:100%;line-height:0;">
-    <img src="${base64Url}" style="width:100%;height:auto;display:block;">
+  <div style="width:100%;text-align:center;line-height:0;">
+    <img src="${base64Url}" style="height:${h}px;width:auto;display:inline-block;">
   </div>`;
 }
 
@@ -137,8 +138,10 @@ async function generatePDF(html, options = {}) {
     const landscape = options.orientation === 'landscape';
     const pageWidthMm = getPageWidthMm(format, landscape);
 
-    const headerHeightMm = computeImageHeightMm(headerImage, header.height || '60px', pageWidthMm);
-    const footerHeightMm = computeImageHeightMm(footerImage, footer.height || '60px', pageWidthMm);
+    const headerHeightPx = header.logo_height || 50;
+    const footerHeightPx = footer.logo_height || 50;
+    const headerHeightMm = toMm(`${headerHeightPx}px`) + 8;
+    const footerHeightMm = toMm(`${footerHeightPx}px`) + 8;
 
     const hasHeader = !!(headerImage && headerImage.dataUrl);
     const hasFooter = !!(footerImage && footerImage.dataUrl);
@@ -149,8 +152,8 @@ async function generatePDF(html, options = {}) {
       landscape,
       printBackground: true,
       displayHeaderFooter,
-      headerTemplate: hasHeader ? buildImageTemplate(headerImage.dataUrl) : '<span></span>',
-      footerTemplate: hasFooter ? buildImageTemplate(footerImage.dataUrl) : '<span></span>',
+      headerTemplate: hasHeader ? buildImageTemplate(headerImage.dataUrl, header.logo_height) : '<span></span>',
+      footerTemplate: hasFooter ? buildImageTemplate(footerImage.dataUrl, footer.logo_height) : '<span></span>',
       margin: {
         top: hasHeader ? `${headerHeightMm + 5}mm` : baseMargin,
         bottom: hasFooter ? `${footerHeightMm + 5}mm` : baseMargin,
