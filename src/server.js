@@ -92,7 +92,8 @@ app.post('/export-docx', async (req, res) => {
 
   try {
     const docxBuffer = await generateDOCX(parsedSections, metadata, styles);
-    const filename = (metadata.title || 'document').replace(/[^\w-￿\s\-\.]/g, '') + '.docx';
+    console.log("[DOCX] metadata.title =", metadata.title);
+    const filename = (metadata.title || 'document').replace(/[^a-zA-Z0-9_\-. ]/g, '') + '.docx';
     res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document');
     res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
     res.setHeader('Content-Length', docxBuffer.length);
