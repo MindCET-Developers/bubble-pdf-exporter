@@ -111,12 +111,21 @@ function computeImageHeightMm(image, fallbackHeight, pageWidthMm) {
   return toMm(fallbackHeight);
 }
 
-function buildImageTemplate(base64Url, heightPx) {
+function buildHeaderTemplate(base64Url, heightPx) {
   if (!base64Url) return '<span></span>';
   const h = heightPx || 50;
   return `<style>* { margin: 0; padding: 0; } body { margin: 0 !important; }</style>
   <div style="width:100%;text-align:center;line-height:0;">
     <img src="${base64Url}" style="height:${h}px;width:auto;display:inline-block;">
+  </div>`;
+}
+
+function buildFooterTemplate(base64Url, heightPx) {
+  if (!base64Url) return '<span></span>';
+  const h = heightPx || 50;
+  return `<style>* { margin: 0; padding: 0; } body { margin: 0 !important; }</style>
+  <div style="width:95%;margin:0 auto;text-align:center;line-height:0;">
+    <img src="${base64Url}" style="width:100%;height:auto;display:block;">
   </div>`;
 }
 
@@ -152,8 +161,8 @@ async function generatePDF(html, options = {}) {
       landscape,
       printBackground: true,
       displayHeaderFooter,
-      headerTemplate: hasHeader ? buildImageTemplate(headerImage.dataUrl, header.logo_height) : '<span></span>',
-      footerTemplate: hasFooter ? buildImageTemplate(footerImage.dataUrl, footer.logo_height) : '<span></span>',
+      headerTemplate: hasHeader ? buildHeaderTemplate(headerImage.dataUrl, header.logo_height) : '<span></span>',
+      footerTemplate: hasFooter ? buildFooterTemplate(footerImage.dataUrl, footer.logo_height) : '<span></span>',
       margin: {
         top: hasHeader ? `${headerHeightMm + 5}mm` : baseMargin,
         bottom: hasFooter ? `${footerHeightMm + 5}mm` : baseMargin,
