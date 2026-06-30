@@ -28,7 +28,7 @@ function guessImageType(url) {
 
 // DXA constants (1440 DXA = 1 inch)
 const PAGE_WIDTH_DXA = 11906; // A4
-const MARGIN_DXA = 1134;      // ~2cm
+const MARGIN_DXA = 720;       // ~1.25cm (reduced from 1134)
 const CONTENT_WIDTH_DXA = PAGE_WIDTH_DXA - MARGIN_DXA * 2;
 
 const BORDER = { style: BorderStyle.SINGLE, size: 1, color: 'CCCCCC' };
@@ -42,7 +42,7 @@ async function sectionToParagraphs(section, styles) {
     return [new Paragraph({
       bidirectional: rtl,
       alignment: AlignmentType.RIGHT,
-      spacing: { before: 240, after: 120 },
+      spacing: { before: 120, after: 60 },
       children: [new TextRun({
         text: section.text || '',
         rightToLeft: rtl,
@@ -87,7 +87,7 @@ async function sectionToParagraphs(section, styles) {
         borders: CELL_BORDERS,
         width: { size: colWidth, type: WidthType.DXA },
         shading: { fill: 'F0F0F0', type: ShadingType.CLEAR },
-        margins: { top: 80, bottom: 80, left: 120, right: 120 },
+        margins: { top: 40, bottom: 40, left: 60, right: 60 },
         children: [new Paragraph({
           bidirectional: rtl,
           alignment: AlignmentType.RIGHT,
@@ -100,7 +100,7 @@ async function sectionToParagraphs(section, styles) {
       children: row.map(cell => new TableCell({
         borders: CELL_BORDERS,
         width: { size: colWidth, type: WidthType.DXA },
-        margins: { top: 80, bottom: 80, left: 120, right: 120 },
+        margins: { top: 40, bottom: 40, left: 60, right: 60 },
         children: [new Paragraph({
           bidirectional: rtl,
           alignment: AlignmentType.RIGHT,
@@ -188,13 +188,14 @@ async function generateDOCX(sections, metadata = {}, styles = {}) {
 
   // Copyright block
   allParagraphs.push(
-    new Paragraph({ children: [] }),
     new Paragraph({
+      spacing: { before: 120 },
       bidirectional: true,
       alignment: AlignmentType.CENTER,
       children: [new TextRun({ text: 'מורה יקר/ה, אנחנו שמחים לשתף אותך בתכנים המקצועיים שפיתחנו', size: 22, rightToLeft: true })],
     }),
     new Paragraph({
+      spacing: { after: 0 },
       bidirectional: true,
       alignment: AlignmentType.CENTER,
       border: {
