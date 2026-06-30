@@ -56,7 +56,7 @@ async function sectionToParagraphs(section, styles) {
     return [new Paragraph({
       bidirectional: rtl,
       alignment: AlignmentType.RIGHT,
-      spacing: { line: 240, lineRule: 'auto' },
+      spacing: { before: 0, after: 0, line: 240, lineRule: 'auto' },
       children: [new TextRun({ text: section.text || '', rightToLeft: rtl })],
     })];
   }
@@ -163,7 +163,12 @@ async function sectionToParagraphs(section, styles) {
       runs.push(new TextRun({ text: `${f.value}  `, rightToLeft: rtl }));
     }
     runs.push(new TextRun({ text: '<<', bold: true, color: 'E5791F', rightToLeft: rtl }));
-    return [new Paragraph({ bidirectional: rtl, alignment: AlignmentType.RIGHT, children: runs })];
+    return [new Paragraph({
+      bidirectional: rtl,
+      alignment: AlignmentType.RIGHT,
+      spacing: { before: 0, after: 0, line: 240, lineRule: 'auto' },
+      children: runs
+    })];
   }
 
   if (section.type === 'divider') {
