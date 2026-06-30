@@ -28,7 +28,7 @@ function guessImageType(url) {
 
 // DXA constants (1440 DXA = 1 inch)
 const PAGE_WIDTH_DXA = 11906; // A4
-const MARGIN_DXA = 1134;      // ~2cm
+const MARGIN_DXA = 720;       // ~1.25cm (reduced from 1134)
 const CONTENT_WIDTH_DXA = PAGE_WIDTH_DXA - MARGIN_DXA * 2;
 
 const BORDER = { style: BorderStyle.SINGLE, size: 1, color: 'CCCCCC' };
@@ -38,11 +38,11 @@ async function sectionToParagraphs(section, styles) {
   const rtl = true; // always RTL for Hebrew
 
   if (['h1', 'h2', 'h3', 'h4'].includes(section.type)) {
-    const sizeMap = { h1: 40, h2: 32, h3: 28, h4: 24 };
+    const sizeMap = { h1: 32, h2: 28, h3: 24, h4: 20 };
     return [new Paragraph({
       bidirectional: rtl,
       alignment: AlignmentType.RIGHT,
-      spacing: { before: 240, after: 120 },
+      spacing: { before: 80, after: 40, line: 240, lineRule: 'auto' },
       children: [new TextRun({
         text: section.text || '',
         rightToLeft: rtl,
@@ -56,6 +56,7 @@ async function sectionToParagraphs(section, styles) {
     return [new Paragraph({
       bidirectional: rtl,
       alignment: AlignmentType.RIGHT,
+      spacing: { before: 0, after: 0, line: 240, lineRule: 'auto' },
       children: [new TextRun({ text: section.text || '', rightToLeft: rtl })],
     })];
   }
@@ -64,6 +65,7 @@ async function sectionToParagraphs(section, styles) {
     return (section.items || []).map(item => new Paragraph({
       numbering: { reference: 'bullets', level: 0 },
       bidirectional: rtl,
+      spacing: { line: 240, lineRule: 'auto', after: 0 },
       children: [new TextRun({ text: item, rightToLeft: rtl })],
     }));
   }
@@ -72,6 +74,7 @@ async function sectionToParagraphs(section, styles) {
     return (section.items || []).map(item => new Paragraph({
       numbering: { reference: 'numbers', level: 0 },
       bidirectional: rtl,
+      spacing: { line: 240, lineRule: 'auto', after: 0 },
       children: [new TextRun({ text: item, rightToLeft: rtl })],
     }));
   }
@@ -87,7 +90,7 @@ async function sectionToParagraphs(section, styles) {
         borders: CELL_BORDERS,
         width: { size: colWidth, type: WidthType.DXA },
         shading: { fill: 'F0F0F0', type: ShadingType.CLEAR },
-        margins: { top: 80, bottom: 80, left: 120, right: 120 },
+        margins: { top: 40, bottom: 40, left: 60, right: 60 },
         children: [new Paragraph({
           bidirectional: rtl,
           alignment: AlignmentType.RIGHT,
@@ -100,7 +103,7 @@ async function sectionToParagraphs(section, styles) {
       children: row.map(cell => new TableCell({
         borders: CELL_BORDERS,
         width: { size: colWidth, type: WidthType.DXA },
-        margins: { top: 80, bottom: 80, left: 120, right: 120 },
+        margins: { top: 40, bottom: 40, left: 60, right: 60 },
         children: [new Paragraph({
           bidirectional: rtl,
           alignment: AlignmentType.RIGHT,
@@ -125,16 +128,18 @@ async function sectionToParagraphs(section, styles) {
       const type = guessImageType(section.url);
       const paras = [new Paragraph({
         alignment: AlignmentType.CENTER,
+        spacing: { before: 40, after: 40 },
         children: [new ImageRun({
           type,
           data,
-          transformation: { width: 400, height: 300 },
+          transformation: { width: 320, height: 240 },
           altText: { title: section.caption || 'image', description: section.caption || '', name: 'image' },
         })],
       })];
       if (section.caption) {
         paras.push(new Paragraph({
           alignment: AlignmentType.CENTER,
+          spacing: { after: 40 },
           children: [new TextRun({ text: section.caption, size: 18, color: '888888' })],
         }));
       }
@@ -158,18 +163,24 @@ async function sectionToParagraphs(section, styles) {
       runs.push(new TextRun({ text: `${f.value}  `, rightToLeft: rtl }));
     }
     runs.push(new TextRun({ text: '<<', bold: true, color: 'E5791F', rightToLeft: rtl }));
-    return [new Paragraph({ bidirectional: rtl, alignment: AlignmentType.RIGHT, children: runs })];
+    return [new Paragraph({
+      bidirectional: rtl,
+      alignment: AlignmentType.RIGHT,
+      spacing: { before: 0, after: 0, line: 240, lineRule: 'auto' },
+      children: runs
+    })];
   }
 
   if (section.type === 'divider') {
     return [new Paragraph({
       border: { bottom: { style: BorderStyle.SINGLE, size: 6, color: 'CCCCCC', space: 1 } },
+      spacing: { before: 40, after: 40 },
       children: [],
     })];
   }
 
   if (section.type === 'spacer') {
-    return [new Paragraph({ children: [new TextRun('')] })];
+    return [new Paragraph({ spacing: { before: 0, after: 0 }, children: [new TextRun('')] })];
   }
 
   if (section.type === 'page_break') {
@@ -188,13 +199,14 @@ async function generateDOCX(sections, metadata = {}, styles = {}) {
 
   // Copyright block
   allParagraphs.push(
-    new Paragraph({ children: [] }),
     new Paragraph({
+      spacing: { before: 120 },
       bidirectional: true,
       alignment: AlignmentType.CENTER,
       children: [new TextRun({ text: 'מורה יקר/ה, אנחנו שמחים לשתף אותך בתכנים המקצועיים שפיתחנו', size: 22, rightToLeft: true })],
     }),
     new Paragraph({
+      spacing: { after: 0 },
       bidirectional: true,
       alignment: AlignmentType.CENTER,
       border: {
@@ -213,7 +225,7 @@ async function generateDOCX(sections, metadata = {}, styles = {}) {
   const doc = new Document({
     styles: {
       default: {
-        document: { run: { font: fontFamily, size: 24, rightToLeft: true } },
+        document: { run: { font: fontFamily, size: 22, rightToLeft: true } },
       },
     },
     numbering: {
