@@ -65,6 +65,7 @@ async function sectionToParagraphs(section, styles) {
     return (section.items || []).map(item => new Paragraph({
       numbering: { reference: 'bullets', level: 0 },
       bidirectional: rtl,
+      spacing: { line: 240, lineRule: 'auto', after: 0 },
       children: [new TextRun({ text: item, rightToLeft: rtl })],
     }));
   }
@@ -73,6 +74,7 @@ async function sectionToParagraphs(section, styles) {
     return (section.items || []).map(item => new Paragraph({
       numbering: { reference: 'numbers', level: 0 },
       bidirectional: rtl,
+      spacing: { line: 240, lineRule: 'auto', after: 0 },
       children: [new TextRun({ text: item, rightToLeft: rtl })],
     }));
   }
@@ -167,12 +169,13 @@ async function sectionToParagraphs(section, styles) {
   if (section.type === 'divider') {
     return [new Paragraph({
       border: { bottom: { style: BorderStyle.SINGLE, size: 6, color: 'CCCCCC', space: 1 } },
+      spacing: { before: 40, after: 40 },
       children: [],
     })];
   }
 
   if (section.type === 'spacer') {
-    return [new Paragraph({ children: [new TextRun('')] })];
+    return [new Paragraph({ spacing: { before: 0, after: 0 }, children: [new TextRun('')] })];
   }
 
   if (section.type === 'page_break') {
