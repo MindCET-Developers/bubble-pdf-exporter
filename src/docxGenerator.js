@@ -38,11 +38,11 @@ async function sectionToParagraphs(section, styles) {
   const rtl = true; // always RTL for Hebrew
 
   if (['h1', 'h2', 'h3', 'h4'].includes(section.type)) {
-    const sizeMap = { h1: 40, h2: 32, h3: 28, h4: 24 };
+    const sizeMap = { h1: 32, h2: 28, h3: 24, h4: 20 };
     return [new Paragraph({
       bidirectional: rtl,
       alignment: AlignmentType.RIGHT,
-      spacing: { before: 120, after: 60 },
+      spacing: { before: 80, after: 40, line: 240, lineRule: 'auto' },
       children: [new TextRun({
         text: section.text || '',
         rightToLeft: rtl,
@@ -56,6 +56,7 @@ async function sectionToParagraphs(section, styles) {
     return [new Paragraph({
       bidirectional: rtl,
       alignment: AlignmentType.RIGHT,
+      spacing: { line: 240, lineRule: 'auto' },
       children: [new TextRun({ text: section.text || '', rightToLeft: rtl })],
     })];
   }
@@ -125,16 +126,18 @@ async function sectionToParagraphs(section, styles) {
       const type = guessImageType(section.url);
       const paras = [new Paragraph({
         alignment: AlignmentType.CENTER,
+        spacing: { before: 40, after: 40 },
         children: [new ImageRun({
           type,
           data,
-          transformation: { width: 400, height: 300 },
+          transformation: { width: 320, height: 240 },
           altText: { title: section.caption || 'image', description: section.caption || '', name: 'image' },
         })],
       })];
       if (section.caption) {
         paras.push(new Paragraph({
           alignment: AlignmentType.CENTER,
+          spacing: { after: 40 },
           children: [new TextRun({ text: section.caption, size: 18, color: '888888' })],
         }));
       }
@@ -214,7 +217,7 @@ async function generateDOCX(sections, metadata = {}, styles = {}) {
   const doc = new Document({
     styles: {
       default: {
-        document: { run: { font: fontFamily, size: 24, rightToLeft: true } },
+        document: { run: { font: fontFamily, size: 22, rightToLeft: true } },
       },
     },
     numbering: {
